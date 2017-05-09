@@ -17,14 +17,21 @@ import java.util.HashMap;
 public class MainActivity extends AppCompatActivity {
 
     DBHelper dbHelper;
-    ListView toDoList;
-    ListView checkedList;
+
     EditText editText;
+
     ArrayList<String> allToDos;
+
+    // to do list
+    ListView toDoList;
     ArrayList<String> toDos;
+    ArrayAdapter toDoAdapter;
+
+    // done list
+    ListView checkedList;
     ArrayList<String> dones;
-    ArrayAdapter adapter;
-    ArrayAdapter adapterDone;
+    ArrayAdapter doneAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,17 +53,17 @@ public class MainActivity extends AppCompatActivity {
         for (int i=0; i < allToDosSize; i++) {
             String task = allToDos.get(i);
             String status = (String) getToDo(task, 0);
-            if (status.equals("done")) {
+            if (status.equals("notDone")) {
                 toDos.add(task);
             } else {
                 dones.add(task);
             }
         }
-        adapter = new ArrayAdapter(this, R.layout.list_layout, R.id.notCheckedView, toDos);
-        toDoList.setAdapter(adapter);
+        toDoAdapter = new ArrayAdapter(this, R.layout.list_layout, R.id.notCheckedView, toDos);
+        toDoList.setAdapter(toDoAdapter);
 
-        adapterDone = new ArrayAdapter(this, android.R.layout.simple_list_item_1, dones);
-        checkedList.setAdapter(adapterDone);
+        doneAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, dones);
+        checkedList.setAdapter(doneAdapter);
         setListeners();
         //        toDoList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 //            @Override
@@ -66,10 +73,10 @@ public class MainActivity extends AppCompatActivity {
 //                String task = taskView.getText().toString();
 //                int idToDo = (Integer) getToDo(task, 1);
 //                dbHelper.update(idToDo, "done");
-//                adapter.remove(task);
-//                adapterDone.add(task);
-//                adapter.notifyDataSetChanged();
-//                adapterDone.notifyDataSetChanged();
+//                toDoAdapter.remove(task);
+//                doneAdapter.add(task);
+//                toDoAdapter.notifyDataSetChanged();
+//                DoneAdapter.notifyDataSetChanged();
 //            }
 //        });
     }
@@ -78,15 +85,15 @@ public class MainActivity extends AppCompatActivity {
         String task = editText.getText().toString();
         ToDoClass toDo = new ToDoClass(task, "notDone");
         dbHelper.create(toDo);
-        adapter.add(toDo.todoPub);
-        adapter.notifyDataSetChanged();
+        toDoAdapter.add(toDo.todoPub);
+        toDoAdapter.notifyDataSetChanged();
     }
 
     public void deleteTaskDone(String task) {
         int id = (Integer) getToDo(task, 1);
         dbHelper.delete(id);
-        adapterDone.remove(task);
-        adapterDone.notifyDataSetChanged();
+        doneAdapter.remove(task);
+        doneAdapter.notifyDataSetChanged();
     }
 
     public void setListeners() {
@@ -114,17 +121,20 @@ public class MainActivity extends AppCompatActivity {
 //        }
 //    }
 
+    // using checkbox because I was unable to get OnItemClickListener working
+    // the checkboxes have only the purpose of making it clickable.
+    //
     public void update(View view) {
         RelativeLayout layout = (RelativeLayout) view.getParent();
         TextView taskView = (TextView) layout.getChildAt(0);
         String task = taskView.getText().toString();
-        CheckBox checkbox = (CheckBox) view;
         int id = (Integer) getToDo(task, 1);
         dbHelper.update(id, "done");
-        adapter.remove(task);
-        adapterDone.add(task);
-        adapter.notifyDataSetChanged();
-        adapterDone.notifyDataSetChanged();
+        toDoAdapter.remove(task);
+        doneAdapter.add(task);
+        toDoAdapter.notifyDataSetChanged();
+        doneAdapter.notifyDataSetChanged();
+        CheckBox checkbox = (CheckBox) view;
         checkbox.setChecked(false);
     }
 

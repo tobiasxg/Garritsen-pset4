@@ -46,7 +46,6 @@ public class DBHelper extends SQLiteOpenHelper {
     public void create(ToDoClass task) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
-        // put task and status in database
         values.put(KEY_TODO, task.todoPub);
         values.put(KEY_CHECK, task.checkPub);
         db.insert(TABLE, null, values);
@@ -86,13 +85,14 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    // get data using argument todoVScheck, 1= id and 0=status/check
     public ArrayList<HashMap<String, String>> getData(int todoVScheck){
         SQLiteDatabase db = getReadableDatabase();
         String query;
         if(todoVScheck==1)
             query = "SELECT _id , " + KEY_TODO + " FROM " + TABLE;
         else
-            query = "SELECT _id , " + KEY_TODO + ", " + KEY_CHECK + " FROM " + TABLE; //check
+            query = "SELECT _id , " + KEY_TODO + ", " + KEY_CHECK + " FROM " + TABLE;
         ArrayList<HashMap<String, String>> toDoList = new ArrayList<>();
         Cursor cursor = db.rawQuery(query, null);
         if (cursor.moveToFirst()) {
