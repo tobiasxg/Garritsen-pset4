@@ -16,7 +16,7 @@ import java.util.HashMap;
 public class DBHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "ToDoDB.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
     private static final String TABLE = "todo";
 
     private String KEY_TODO = "todoTitle";

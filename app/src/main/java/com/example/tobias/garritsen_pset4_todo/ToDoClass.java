@@ -8,7 +8,6 @@ public class ToDoClass {
     String todoPub;
     String checkPub;
 
-    // This is the constructor
     public ToDoClass(String todo, String check){
         todoPub = todo;
         checkPub = check;

@@ -5,11 +5,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
+import android.widget.ListView;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,13 +17,12 @@ import java.util.HashMap;
 public class MainActivity extends AppCompatActivity {
 
     DBHelper dbHelper;
-
     ListView toDoList;
     ListView checkedList;
-    EditText taskBar;
-    ArrayList<String> tasks;
-    ArrayList<String> toDoTasks;
-    ArrayList<String> doneTasks;
+    EditText editText;
+    ArrayList<String> allToDos;
+    ArrayList<String> toDos;
+    ArrayList<String> dones;
     ArrayAdapter adapter;
     ArrayAdapter adapterDone;
 
@@ -32,29 +31,53 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        toDoList = (ListView) findViewById(R.id.listView);
-        checkedList = (ListView) findViewById(R.id.doneView);
-        taskBar = (EditText) findViewById(R.id.toDo);
         dbHelper = new DBHelper(this);
-        tasks = dbHelper.read();
-        // divides the tasks between the done tasks and the tasks yet to be executed
-        setLists();
-        // adapter for the to do list
-        adapter = new ArrayAdapter(this, R.layout.list_layout, R.id.taskView, toDoTasks);
+        allToDos = dbHelper.read();
+        createLists();
+    }
+
+    public void createLists() {
+        toDoList = (ListView) findViewById(R.id.listViewTodo);
+        checkedList = (ListView) findViewById(R.id.listViewDone);
+        editText = (EditText) findViewById(R.id.toDo);
+        toDos = new ArrayList<>();
+        dones = new ArrayList<>();
+        int allToDosSize = allToDos.size();
+        for (int i=0; i < allToDosSize; i++) {
+            String task = allToDos.get(i);
+            String status = (String) getToDo(task, 0);
+            if (status.equals("done")) {
+                toDos.add(task);
+            } else {
+                dones.add(task);
+            }
+        }
+        adapter = new ArrayAdapter(this, R.layout.list_layout, R.id.notCheckedView, toDos);
         toDoList.setAdapter(adapter);
-        // adapter for the done list
-        adapterDone = new ArrayAdapter(this, android.R.layout.simple_list_item_1, doneTasks);
+
+        adapterDone = new ArrayAdapter(this, android.R.layout.simple_list_item_1, dones);
         checkedList.setAdapter(adapterDone);
-        // listeners for both lists
         setListeners();
+        //        toDoList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            // get page of movie by clicking on one of the movie names
+//            public void onItemClick(AdapterView parent, View view, int position, long id) {
+//                TextView taskView = (TextView) view;
+//                String task = taskView.getText().toString();
+//                int idToDo = (Integer) getToDo(task, 1);
+//                dbHelper.update(idToDo, "done");
+//                adapter.remove(task);
+//                adapterDone.add(task);
+//                adapter.notifyDataSetChanged();
+//                adapterDone.notifyDataSetChanged();
+//            }
+//        });
     }
 
     public void addToDo(View view) {
-        String task = taskBar.getText().toString();
-        // creat task obect where status is to be done on default
-        ToDoClass toDo = new ToDoClass(task, "notChecked");
+        String task = editText.getText().toString();
+        ToDoClass toDo = new ToDoClass(task, "notDone");
         dbHelper.create(toDo);
-        // update adapter
         adapter.add(toDo.todoPub);
         adapter.notifyDataSetChanged();
     }
@@ -62,11 +85,9 @@ public class MainActivity extends AppCompatActivity {
     public void deleteTaskDone(String task) {
         int id = (Integer) getToDo(task, 1);
         dbHelper.delete(id);
-        // update adapter
         adapterDone.remove(task);
         adapterDone.notifyDataSetChanged();
     }
-
 
     public void setListeners() {
         checkedList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -79,9 +100,37 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+//    public void setListeners(){
+//        checkedList = (ListView) findViewById(R.id.doneView);
+//        AdapterView.OnItemLongClickListener myLongClickListener = new MyLongClickListener();
+//        checkedList.setOnLongClickListener(myLongClickListener);
+//    }
+//
+//    private class MyLongClickListener implements AdapterView.OnItemLongClickListener {
+//        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long viewId) {
+//            String task = checkedList.getItemAtPosition(position).toString();
+//            deleteTaskDone(task);
+//            return true;
+//        }
+//    }
+
+    public void update(View view) {
+        RelativeLayout layout = (RelativeLayout) view.getParent();
+        TextView taskView = (TextView) layout.getChildAt(0);
+        String task = taskView.getText().toString();
+        CheckBox checkbox = (CheckBox) view;
+        int id = (Integer) getToDo(task, 1);
+        dbHelper.update(id, "done");
+        adapter.remove(task);
+        adapterDone.add(task);
+        adapter.notifyDataSetChanged();
+        adapterDone.notifyDataSetChanged();
+        checkbox.setChecked(false);
+    }
+
     public Object getToDo(String todoName, int todoVScheck) {
-        int id = 0;
-        String check = null;
+        int id;
+        String check;
         ArrayList<HashMap<String, String>> idHashMap = dbHelper.getData(todoVScheck);//id=1 check=0
         HashMap hashMapTemp;
         String todoTitle;

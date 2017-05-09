@@ -6,19 +6,19 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
         android:clickable="true"
-        android:textSize="16dp"
-        android:padding="11dp"
-        android:id="@+id/taskView" />
+        android:id="@+id/notCheckedView"
+        android:textSize="20dp"
+        android:padding="20dp"
+        android:layout_alignParentStart="true" />
 
     <CheckBox
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="updateStatus"
-        android:id="@+id/taskBox"
+        android:onClick="update"
+        android:id="@+id/checkbox"
+        android:layout_below="@+id/notCheckedView"
         android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/taskView"
-        android:layout_marginStart="135dp" />
+        android:layout_alignParentStart="true" />
 
 </RelativeLayout>
