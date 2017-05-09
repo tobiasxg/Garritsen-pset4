@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
         dbHelper = new DBHelper(this);
         allToDos = dbHelper.read();
+//        checkedList.setOnItemLongClickListener(new MyLongClickListener());
         createLists();
     }
 
@@ -65,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
         doneAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, dones);
         checkedList.setAdapter(doneAdapter);
         setListeners();
+
         //        toDoList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 //            @Override
 //            // get page of movie by clicking on one of the movie names
@@ -96,30 +98,30 @@ public class MainActivity extends AppCompatActivity {
         doneAdapter.notifyDataSetChanged();
     }
 
-    public void setListeners() {
-        checkedList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long viewId) {
-                String task = checkedList.getItemAtPosition(position).toString();
-                deleteTaskDone(task);
-                return true;
-            }
-        });
-    }
+//    public void setListeners() {
+//        checkedList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+//            @Override
+//            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long viewId) {
+//                String task = checkedList.getItemAtPosition(position).toString();
+//                deleteTaskDone(task);
+//                return true;
+//            }
+//        });
+//    }
 
-//    public void setListeners(){
-//        checkedList = (ListView) findViewById(R.id.doneView);
-//        AdapterView.OnItemLongClickListener myLongClickListener = new MyLongClickListener();
-//        checkedList.setOnLongClickListener(myLongClickListener);
-//    }
+    public void setListeners(){
+        checkedList = (ListView) findViewById(R.id.listViewDone);
+        AdapterView.OnItemLongClickListener myLongClickListener = new MyLongClickListener();
+        checkedList.setOnItemLongClickListener(myLongClickListener);
+    }
 //
-//    private class MyLongClickListener implements AdapterView.OnItemLongClickListener {
-//        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long viewId) {
-//            String task = checkedList.getItemAtPosition(position).toString();
-//            deleteTaskDone(task);
-//            return true;
-//        }
-//    }
+    private class MyLongClickListener implements AdapterView.OnItemLongClickListener {
+        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long viewId) {
+            String task = checkedList.getItemAtPosition(position).toString();
+            deleteTaskDone(task);
+            return true;
+        }
+    }
 
     // using checkbox because I was unable to get OnItemClickListener working
     // the checkboxes have only the purpose of making it clickable.
